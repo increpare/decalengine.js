@@ -29,3 +29,5 @@ var COLORS = [
 
 PIXI.scaleModes.DEFAULT = PIXI.scaleModes.NEAREST;
 
+
+var spriteTextures = [];

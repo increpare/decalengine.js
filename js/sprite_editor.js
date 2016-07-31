@@ -12,7 +12,7 @@ var SPRITE_CANVAS_SIZE = PANEL_WIDTH-4*SPR_THUMBNAIL_WIDTH-6*SPR_THUMBNAIL_H_MAR
 var SPRITE_CANVAS_LEFT = PANEL_WIDTH-SPRITE_CANVAS_SIZE-3*SPR_THUMBNAIL_WIDTH-4*SPR_THUMBNAIL_H_MARGIN;
 var SPRITE_CANVAS_TOP = SPR_THUMBNAIL_V_OFFSET+2;
 	
-var RENDER_TEXTURE_SIZE=SPRITE_CANVAS_SIZE;
+var SPR_RENDER_TEXTURE_SIZE=SPRITE_CANVAS_SIZE;
 
 var sprite_editor_container_container;
 var sprite_editor_container;
@@ -30,7 +30,6 @@ var paletteSelectionIcons = [new PIXI.Graphics(),new PIXI.Graphics()];
 var spriteSelectionIcon = null;
 
 var textures=[];
-var spriteTextures = [];
 
 //	shapeIndex, 
 //	colIndex, 
@@ -213,7 +212,7 @@ function makeSpriteEditor(){
 	var widgets = [];
 
 	for (var i=0;i<7*3;i++){
-		var tex = new PIXI.RenderTexture(renderer, RENDER_TEXTURE_SIZE, RENDER_TEXTURE_SIZE, PIXI.SCALE_MODES.LINEAR, 1);
+		var tex = new PIXI.RenderTexture(renderer, SPR_RENDER_TEXTURE_SIZE, SPR_RENDER_TEXTURE_SIZE, PIXI.SCALE_MODES.LINEAR, 1);
 		spriteTextures.push(tex);
 	}
 

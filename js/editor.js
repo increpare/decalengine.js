@@ -101,9 +101,9 @@ navButtons.push(makeButton(offsetX,1,126,30,"Music",colDat,onTabButtonClick(setP
 offsetX+=128;
 navButtons.push(makeButton(offsetX,1,126,30,"Sfx",colDat,onTabButtonClick(setPage,navButtons,5)));
 offsetX+=128;
-navButtons.push(makeButton(offsetX,1,126,30,"Options",colDat,onTabButtonClick(setPage,navButtons,6)));
+navButtons.push(makeButton(offsetX,1,126,30,"Run",colDat,onTabButtonClick(setPage,navButtons,6)));
 offsetX+=128;
-navButtons.push(makeButton(offsetX,1,126,30,"Help",colDat,onTabButtonClick(setPage,navButtons,7)));
+navButtons.push(makeButton(offsetX,1,126,30,"Options",colDat,onTabButtonClick(setPage,navButtons,7)));
 
 pages.push(makeScenesEditor());
 pages.push([]);//scene
@@ -113,6 +113,7 @@ pages.push([]);//music
 pages.push([]);//sfx
 pages.push([]);//options
 pages.push([]);//help
+pages[1]=makeSceneEditor();
 
 // start animating
 animate();

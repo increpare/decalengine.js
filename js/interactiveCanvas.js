@@ -1,6 +1,4 @@
-function dot(p1,p2){
-	return p1.x*p2.x+p1.y*p2.y;
-}
+
 
 function CreateInteractiveCanvas(x,y,w,h,source_container,source_container_FG,onModified){
 
@@ -243,9 +241,9 @@ function CreateInteractiveCanvas(x,y,w,h,source_container,source_container_FG,on
 		for (var i=dat.contents.length-1;i>=0;i--){
 			var e = dat.contents[i];
 			if (i===idx){
-				i.tint = 0.5;
+				i.alpha = 0.8;
 			} else {
-				i.tint = 1.0;
+				i.alpha = 1.0;
 			}
 		}
 		setHandles();
@@ -268,7 +266,7 @@ function CreateInteractiveCanvas(x,y,w,h,source_container,source_container_FG,on
 					esize:[e.width,e.height]
 				});
 				selectObject(i);
-				dat.contents[dat.target].alpha=0.5;
+				dat.contents[dat.target].alpha=0.8;
 	    		var mousePos = source_container.toLocal(event.data.global);
 				dat.dragging=true;
 				dat.offx=e.position.x-mousePos.x;
@@ -293,7 +291,7 @@ function CreateInteractiveCanvas(x,y,w,h,source_container,source_container_FG,on
 	    {
 	        var newPosition = event.data.getLocalPosition(source_container);
 	        var t = dat.contents[dat.target];
-	        t.alpha=0.5;
+	        t.alpha=0.8;
 	        t.position.x = newPosition.x+dat.offx;
 	        t.position.y = newPosition.y+dat.offy;
 
