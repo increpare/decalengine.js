@@ -8,8 +8,6 @@ var PANEL_TOP=32;
 var PANEL_WIDTH=GAME_WIDTH;
 var PANEL_HEIGHT=GAME_HEIGHT-32;
 
-
-
 var COLORS = [
 	0x000000,
 	0x9D9D9D,
@@ -30,3 +28,4 @@ var COLORS = [
 ];
 
 PIXI.scaleModes.DEFAULT = PIXI.scaleModes.NEAREST;
+

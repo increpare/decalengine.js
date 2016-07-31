@@ -6,7 +6,13 @@ var SPR_THUMBNAIL_V_MARGIN = 5;
 var SPR_THUMBNAIL_COLUMNS = 2;
 var SPR_THUMBNAIL_ROWS = 0;
 var SPR_THUMBNAIL_H_OFFSET = 0;
-var SPR_THUMBNAIL_V_OFFSET = 0;
+var SPR_THUMBNAIL_V_OFFSET = PANEL_TOP+SPR_THUMBNAIL_V_MARGIN;
+
+var SPRITE_CANVAS_SIZE = PANEL_WIDTH-4*SPR_THUMBNAIL_WIDTH-6*SPR_THUMBNAIL_H_MARGIN-200;
+var SPRITE_CANVAS_LEFT = PANEL_WIDTH-SPRITE_CANVAS_SIZE-3*SPR_THUMBNAIL_WIDTH-4*SPR_THUMBNAIL_H_MARGIN;
+var SPRITE_CANVAS_TOP = SPR_THUMBNAIL_V_OFFSET+2;
+	
+var RENDER_TEXTURE_SIZE=SPRITE_CANVAS_SIZE;
 
 var sprite_editor_container_container;
 var sprite_editor_container;
@@ -18,9 +24,15 @@ var masks = [];
 
 var colorSelected=2;
 var maskSelected=0;
+var spriteSelected=0;
 
 var paletteSelectionIcons = [new PIXI.Graphics(),new PIXI.Graphics()];
+var spriteSelectionIcon = null;
 
+var SPRITES = [];
+for (var i=0;i<SPR_THUMBNAIL_COLUMNS*8;i++){
+	SPRITES.push(i);
+}
 
 function SetPalleteSelections(){
 	var i = Math.floor(colorSelected/8);
@@ -37,8 +49,22 @@ function SetPalleteSelections(){
 	paletteSelectionIcons[1].position.x = posx-2;
 	paletteSelectionIcons[1].position.y = posy-2;
 
+	i = Math.floor(spriteSelected/8);
+	j = spriteSelected%8;	
+	xpos = SPR_THUMBNAIL_H_OFFSET+(SPR_THUMBNAIL_WIDTH+SPR_THUMBNAIL_H_MARGIN)*(i-1);
+	ypos = SPR_THUMBNAIL_V_OFFSET+(SPR_THUMBNAIL_HEIGHT+SPR_THUMBNAIL_V_MARGIN)*j;
+	spriteSelectionIcon.position.x = xpos-2;
+	spriteSelectionIcon.position.y = ypos-2;
+
 }
 
+function SelectSprite(spr_i){
+	if (spr_i===spriteSelected){
+		return;
+	}
+	spriteSelected = spr_i;
+	SetPalleteSelections();
+}
 function SelectColor(col){
 	if (spriteCanvasContents.target>=0){
 		var t = spriteCanvasContents.contents[spriteCanvasContents.target];
@@ -58,9 +84,16 @@ function SelectMask(idx){
 	SetPalleteSelections();
 }
 
+
 var currentSpriteWidgets = [];
 function makeSpriteEditor(){
 	var widgets = [];
+
+	var spriteTextures = [];
+	for (var i=0;i<7*3;i++){
+		var tex = new PIXI.RenderTexture(renderer, RENDER_TEXTURE_SIZE, RENDER_TEXTURE_SIZE, PIXI.SCALE_MODES.LINEAR, 1);
+		spriteTextures.push(tex);
+	}
 
 	var count=0;
 	for (var right=0;right<PANEL_WIDTH;right++){
@@ -73,7 +106,7 @@ function makeSpriteEditor(){
 	count--;
 
 	SPR_THUMBNAIL_COLUMNS=2;
-	SPR_THUMBNAIL_H_OFFSET = PANEL_WIDTH-2*(SPR_THUMBNAIL_WIDTH+SPR_THUMBNAIL_H_MARGIN);
+	SPR_THUMBNAIL_H_OFFSET = PANEL_WIDTH-(SPR_THUMBNAIL_COLUMNS-1)*(SPR_THUMBNAIL_WIDTH+SPR_THUMBNAIL_H_MARGIN);
 
 	count=0;
 	for (var top=PANEL_TOP;top<PANEL_HEIGHT;top++){
@@ -86,7 +119,6 @@ function makeSpriteEditor(){
 	count--;
 
 	SPR_THUMBNAIL_ROWS=count;
-	SPR_THUMBNAIL_V_OFFSET = PANEL_TOP+SPR_THUMBNAIL_V_MARGIN;
 
 
 	for (var i=0;i<2;i++){
@@ -102,26 +134,20 @@ function makeSpriteEditor(){
 		stage.addChild(paletteSelectionIcon);
 		widgets.push(paletteSelectionIcon);
 	}
-	SetPalleteSelections();
 
-	for (var i=0;i<3;i++){
-		for (var j=0;j<SPR_THUMBNAIL_ROWS;j++){
-
-			//RIGHT COLUMN
-			var panel = new PIXI.Graphics();
-			panel.lineStyle(0);
-			panel.beginFill((i%2)*0xff0000+(j%2)*0x00ff00+0x0000ff, 1);
-			panel.drawRect(
-				SPR_THUMBNAIL_H_OFFSET+(SPR_THUMBNAIL_WIDTH+SPR_THUMBNAIL_H_MARGIN)*(i-1),
-				SPR_THUMBNAIL_V_OFFSET+(SPR_THUMBNAIL_HEIGHT+SPR_THUMBNAIL_V_MARGIN)*j,
-				SPR_THUMBNAIL_WIDTH,
-				SPR_THUMBNAIL_HEIGHT
+	spriteSelectionIcon = new PIXI.Graphics();
+	spriteSelectionIcon.lineStyle(0);
+	spriteSelectionIcon.beginFill(0xff00ff);
+	spriteSelectionIcon.drawRect(
+				0,
+				0,
+				SPR_THUMBNAIL_WIDTH+4,
+				SPR_THUMBNAIL_HEIGHT+4
 			);
-			stage.addChild(panel);
+	stage.addChild(spriteSelectionIcon);
+	widgets.push(spriteSelectionIcon);
 
-			widgets.push(panel);			
-		}
-	}
+	SetPalleteSelections();
 
 	for (var i=0;i<2;i++){
 		for (var j=0;j<SPR_THUMBNAIL_ROWS;j++){
@@ -249,26 +275,23 @@ function makeSpriteEditor(){
 	}
 
 
-	for (var i=0;i<3;i++){
-		for (var j=0;j<SPR_THUMBNAIL_ROWS;j++){
 
-			//RIGHT COLUMN
-			var panel = new PIXI.Graphics();
-			panel.lineStyle(0);
-			panel.beginFill((i%2)*0xff0000+(j%2)*0x00ff00+0x0000ff, 1);
-			panel.drawRect(
-				SPR_THUMBNAIL_H_OFFSET+(SPR_THUMBNAIL_WIDTH+SPR_THUMBNAIL_H_MARGIN)*(i-1),
-				SPR_THUMBNAIL_V_OFFSET+(SPR_THUMBNAIL_HEIGHT+SPR_THUMBNAIL_V_MARGIN)*j,
-				SPR_THUMBNAIL_WIDTH,
-				SPR_THUMBNAIL_HEIGHT
-			);
-			stage.addChild(panel);
+	var render_transform = new PIXI.Matrix();	
+	render_transform.translate(-SPRITE_CANVAS_LEFT,-SPRITE_CANVAS_TOP);
+	//render_transform.translate(-SPRITE_CANVAS_SIZE/2,-SPRITE_CANVAS_SIZE/2);
+	//var mat_scale=(1.0*RENDER_TEXTURE_SIZE)/SPRITE_CANVAS_SIZE;
+	//render_transform.scale(mat_scale,mat_scale);
+	//render_transform.translate(RENDER_TEXTURE_SIZE/2,RENDER_TEXTURE_SIZE/2);
 
-			widgets.push(panel);			
-		}
+	function OnModified(){
+		spriteTextures[spriteSelected].render(
+											sprite_editor_container,
+											render_transform,
+											true,
+											true
+											);
 	}
 
-			
 	var textures=[];
 
 	for (var i=0;i<SPR_THUMBNAIL_COLUMNS;i++){
@@ -281,7 +304,7 @@ function makeSpriteEditor(){
 			var xpos = SPR_THUMBNAIL_H_MARGIN*2+(SPR_THUMBNAIL_H_MARGIN+SPR_THUMBNAIL_WIDTH)*i;
 			var ypos = SPR_THUMBNAIL_V_OFFSET+(SPR_THUMBNAIL_HEIGHT+SPR_THUMBNAIL_V_MARGIN)*j;
 			iconbutton.lineStyle(0);
-			iconbutton.beginFill((i%2)*0x660000+(j%2)*0x006600+0x000066, 1);
+			iconbutton.beginFill(0x555555, 1);
 			iconbutton.drawRect(
 				xpos,
 				ypos,
@@ -314,8 +337,8 @@ function makeSpriteEditor(){
 				icon.anchor.y=0.5;
 				icon.width=200;
 				icon.height=200;
-				icon.position.x=PANEL_WIDTH/2;
-				icon.position.y=PANEL_HEIGHT/2+PANEL_TOP;
+				icon.position.x=SPRITE_CANVAS_LEFT+SPRITE_CANVAS_SIZE/2;
+				icon.position.y=SPRITE_CANVAS_TOP+SPRITE_CANVAS_SIZE/2;
 				//icon.tint=Math.floor(Math.random()*0xffffff);				
 				sprite_editor_container.addChild(icon);
 				icon.hitArea = collisionPolygons["decal"+(idx+1)];
@@ -332,6 +355,8 @@ function makeSpriteEditor(){
 				mask.width=256;
 				mask.height=256;
 				spriteCanvasContents.selectObject(spriteCanvasContents.contents.length-1);
+
+				OnModified();
 			}
 
 			function _hover(){
@@ -374,6 +399,71 @@ function makeSpriteEditor(){
 	}
 
 
+
+
+	for (var i=0;i<SPR_THUMBNAIL_COLUMNS;i++){
+		for (var j=0;j<SPR_THUMBNAIL_ROWS;j++){
+			var index = i*SPR_THUMBNAIL_ROWS+j;
+			//RIGHT COLUMN
+			var panel = new PIXI.Graphics();
+			panel.lineStyle(0);
+			panel.beginFill(0x555555, 1);
+			var xpos = SPR_THUMBNAIL_H_OFFSET+(SPR_THUMBNAIL_WIDTH+SPR_THUMBNAIL_H_MARGIN)*(i-1);
+			var ypos = SPR_THUMBNAIL_V_OFFSET+(SPR_THUMBNAIL_HEIGHT+SPR_THUMBNAIL_V_MARGIN)*j;
+			panel.drawRect(
+				xpos,
+				ypos,
+				SPR_THUMBNAIL_WIDTH,
+				SPR_THUMBNAIL_HEIGHT
+			);
+			stage.addChild(panel);				
+			widgets.push(panel);	
+
+			var preview = new PIXI.Sprite(spriteTextures[i*8+j]);
+			preview.position.x=xpos;
+			preview.position.y=ypos;
+			preview.width=SPR_THUMBNAIL_WIDTH;
+			preview.height=SPR_THUMBNAIL_HEIGHT;
+			preview.hitArea = NO_HIT_AREA;
+
+
+			panel.interactive = true;
+			panel.buttonMode = true;
+
+			function _sprselecthover(){
+//				this.tint=dat.hoverCol;
+			}
+
+			function _sprselectregular(){
+//				this.tint=dat.mainCol;
+			}
+
+
+			function _sprselectdown(idx){
+				return function(){
+//					this.tint=dat.downCol;
+					SelectSprite(idx);
+				}
+			}
+
+			panel
+			    // set the mousedown and touchstart callback...
+			    .on('mousedown', _sprselectdown(index))
+			    .on('touchstart', _sprselectdown(index))
+
+			    // set the mouseup and touchend callback...
+			    .on('mouseup', _sprselectregular)
+			    .on('touchend', _sprselectregular)
+			    .on('mouseupoutside', _sprselectregular)
+			    .on('touchendoutside', _sprselectregular)
+
+
+			stage.addChild(preview);
+			widgets.push(preview);			
+		}
+	}
+
+		
  	sprite_editor_container_container = new PIXI.Container();	
  	sprite_editor_container_container.position.x=0;
  	sprite_editor_container_container.position.y=0;
@@ -391,13 +481,11 @@ function makeSpriteEditor(){
 	var bg_panel_ypos = SPR_THUMBNAIL_V_OFFSET+2;
 	canvaspanel.lineStyle(0);
 	canvaspanel.beginFill(0x555555, 1);
-	var s = PANEL_WIDTH-4*SPR_THUMBNAIL_WIDTH-6*SPR_THUMBNAIL_H_MARGIN-200;
-	var panelx = PANEL_WIDTH-s-3*SPR_THUMBNAIL_WIDTH-4*SPR_THUMBNAIL_H_MARGIN;
 	canvaspanel.drawRect(
-		panelx,
-		bg_panel_ypos,
-		s,
-		s
+		SPRITE_CANVAS_LEFT,
+		SPRITE_CANVAS_TOP,
+		SPRITE_CANVAS_SIZE,
+		SPRITE_CANVAS_SIZE
 	);
 
 
@@ -406,10 +494,10 @@ function makeSpriteEditor(){
 	canvaspanel2.lineStyle(0);
 	canvaspanel2.beginFill(0x555555, 1);
 	canvaspanel2.drawRect(
-		panelx,
-		bg_panel_ypos,
-		s,
-		s
+		SPRITE_CANVAS_LEFT,
+		SPRITE_CANVAS_TOP,
+		SPRITE_CANVAS_SIZE,
+		SPRITE_CANVAS_SIZE
 	);
 
 	
@@ -421,7 +509,15 @@ function makeSpriteEditor(){
 	sprite_editor_container.addChild(canvaspanel);
 	sprite_editor_container.addChild(canvaspanel2);
 	
-	spriteCanvasContents = CreateInteractiveCanvas(panelx,bg_panel_ypos,s,s,sprite_editor_container,sprite_editor_container_FG);
+	spriteCanvasContents = CreateInteractiveCanvas(
+								SPRITE_CANVAS_LEFT,
+								SPRITE_CANVAS_TOP,
+								SPRITE_CANVAS_SIZE,
+								SPRITE_CANVAS_SIZE,
+								sprite_editor_container,
+								sprite_editor_container_FG,
+								OnModified
+								);
 
 	widgets.push(sprite_editor_container_container);
 	widgets.push(sprite_editor_container);

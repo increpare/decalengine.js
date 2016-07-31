@@ -2,7 +2,7 @@ function dot(p1,p2){
 	return p1.x*p2.x+p1.y*p2.y;
 }
 
-function CreateInteractiveCanvas(x,y,w,h,source_container,source_container_FG){
+function CreateInteractiveCanvas(x,y,w,h,source_container,source_container_FG,onModified){
 
 	var handleTex_rotations = [
 		PIXI.Texture.fromImage("gfx/ui/handle_rotate0.png",null,PIXI.SCALE_MODES.NEAREST),
@@ -61,6 +61,9 @@ function CreateInteractiveCanvas(x,y,w,h,source_container,source_container_FG){
 		
 		function handleGrabEnd(idx){
 			return function(event){
+				if (draggingTarget>=0){
+					onModified();
+				}
 				draggingTarget=-1;
 				window.console.log("end" + idx);
 
@@ -278,9 +281,10 @@ function CreateInteractiveCanvas(x,y,w,h,source_container,source_container_FG){
 	function onDragEnd(){
 		if (dat.target===-1){
 			return;
-		}
+		}			
 		dat.contents[dat.target].alpha=1.0;
 		dat.dragging=false;
+		onModified();
 		setHandles();			
 	}
 
