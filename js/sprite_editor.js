@@ -29,10 +29,65 @@ var spriteSelected=0;
 var paletteSelectionIcons = [new PIXI.Graphics(),new PIXI.Graphics()];
 var spriteSelectionIcon = null;
 
+var textures=[];
+var spriteTextures = [];
+
+//	shapeIndex, 
+//	colIndex, 
+//	maskIndex,
+//	spr.position.x,
+//	spr.position.y,
+//	spr.rotation,
+//	spr.scale.x,
+//	spr.scale.y						
 var SPRITES = [];
 for (var i=0;i<SPR_THUMBNAIL_COLUMNS*8;i++){
-	SPRITES.push(i);
+	SPRITES.push([]);
 }
+
+
+var render_transform = new PIXI.Matrix();	
+render_transform.translate(-SPRITE_CANVAS_LEFT,-SPRITE_CANVAS_TOP);
+
+function OnModified(index,shapeIndex,colIndex, maskIndex){
+	spriteTextures[spriteSelected].render(
+										sprite_editor_container,
+										render_transform,
+										true,
+										true
+										);
+
+	var spr = spriteCanvasContents.contents[index];
+	if (index>=SPRITES[spriteSelected].length){
+		//add new sprite
+		var entry = [ 
+						shapeIndex, 	//0
+						colIndex, 		//1
+						maskIndex,		//2
+						spr.position.x,	//3
+						spr.position.y,	//4
+						spr.rotation,	//5
+						spr.scale.x,	//6
+						spr.scale.y 	//7
+					];
+		SPRITES[spriteSelected].push(entry);
+	} else {
+		//modify existing sprite
+		var entry = SPRITES[spriteSelected][index];
+		if (colIndex!==undefined){
+			entry[1]=colIndex;
+		}
+		if (maskIndex!==undefined){
+			entry[2]=maskIndex;
+		}
+		entry[3]=spr.position.x;
+		entry[4]=spr.position.y;
+		entry[5]=spr.rotation;
+		entry[6]=spr.scale.x;
+		entry[7]=spr.scale.y;
+	}
+}
+
 
 function SetPalleteSelections(){
 	var i = Math.floor(colorSelected/8);
@@ -57,30 +112,98 @@ function SetPalleteSelections(){
 	spriteSelectionIcon.position.y = ypos-2;
 
 }
+function AddSprite(
+					shapeIndex,
+					colIndex,
+					maskIndex,
+					x,
+					y,
+					rotation,
+					scalex,
+					scaley)
+{				
+	var icon = new PIXI.Sprite(textures[shapeIndex]);
+	icon.interactive=true;
+	icon.anchor.x=0.5;
+	icon.anchor.y=0.5;
+	icon.scale.x=scalex;
+	icon.scale.y=scaley;
+	icon.position.x=x;
+	icon.position.y=y;
+	icon.rotation=rotation;
+	//icon.tint=Math.floor(Math.random()*0xffffff);				
+	sprite_editor_container.addChild(icon);
+	icon.hitArea = collisionPolygons["decal"+(shapeIndex+1)];
+	icon.tint = COLORS[colIndex];
+	spriteCanvasContents.contents.push(icon);				
+
+	var mask = new PIXI.Sprite(masks[maskIndex]);
+	icon.addChild(mask);
+	icon.mask=mask;
+	mask.anchor.x=0.5;
+	mask.anchor.y=0.5;
+	mask.position.x=0;
+	mask.position.y=0;
+	mask.rotation=0;
+	mask.width=256;
+	mask.height=256;
+}
 
 function SelectSprite(spr_i){
 	if (spr_i===spriteSelected){
 		return;
 	}
 	spriteSelected = spr_i;
+
+	var SpriteDat = SPRITES[spr_i];
+
+	spriteCanvasContents.selectObject(-1);
+	
+	for (var i=0;i<spriteCanvasContents.contents.length;i++){
+		var spr = spriteCanvasContents.contents[i];
+		sprite_editor_container.removeChild(spr);
+	}
+	spriteCanvasContents.contents.length=0;
+
+
+	for (var i=0;i<SpriteDat.length;i++){
+		var e = SpriteDat[i];
+		AddSprite(e[0],e[1],e[2],e[3],e[4],e[5],e[6],e[7]);
+	}
+
 	SetPalleteSelections();
 }
+
 function SelectColor(col){
+	colorSelected=col;
+
 	if (spriteCanvasContents.target>=0){
 		var t = spriteCanvasContents.contents[spriteCanvasContents.target];
 		t.tint=COLORS[col];
+
+		OnModified(
+			spriteCanvasContents.target,
+			undefined,
+			colorSelected,
+			maskSelected);
 	}
-	colorSelected=col;
 	SetPalleteSelections();
 }
 
 function SelectMask(idx){
+	maskSelected=idx;
 	if (spriteCanvasContents.target>=0){
 		var t = spriteCanvasContents.contents[spriteCanvasContents.target];
 		var c = t.getChildAt(0);
 		c.texture=masks[idx];
+
+
+		OnModified(
+			spriteCanvasContents.target,
+			undefined,
+			colorSelected,
+			maskSelected);
 	}
-	maskSelected=idx;
 	SetPalleteSelections();
 }
 
@@ -89,7 +212,6 @@ var currentSpriteWidgets = [];
 function makeSpriteEditor(){
 	var widgets = [];
 
-	var spriteTextures = [];
 	for (var i=0;i<7*3;i++){
 		var tex = new PIXI.RenderTexture(renderer, RENDER_TEXTURE_SIZE, RENDER_TEXTURE_SIZE, PIXI.SCALE_MODES.LINEAR, 1);
 		spriteTextures.push(tex);
@@ -276,23 +398,6 @@ function makeSpriteEditor(){
 
 
 
-	var render_transform = new PIXI.Matrix();	
-	render_transform.translate(-SPRITE_CANVAS_LEFT,-SPRITE_CANVAS_TOP);
-	//render_transform.translate(-SPRITE_CANVAS_SIZE/2,-SPRITE_CANVAS_SIZE/2);
-	//var mat_scale=(1.0*RENDER_TEXTURE_SIZE)/SPRITE_CANVAS_SIZE;
-	//render_transform.scale(mat_scale,mat_scale);
-	//render_transform.translate(RENDER_TEXTURE_SIZE/2,RENDER_TEXTURE_SIZE/2);
-
-	function OnModified(){
-		spriteTextures[spriteSelected].render(
-											sprite_editor_container,
-											render_transform,
-											true,
-											true
-											);
-	}
-
-	var textures=[];
 
 	for (var i=0;i<SPR_THUMBNAIL_COLUMNS;i++){
 		for (var j=0;j<SPR_THUMBNAIL_ROWS;j++){
@@ -329,34 +434,26 @@ function makeSpriteEditor(){
 			icon.position.y = ypos+2;
 			icon.hitArea = NO_HIT_AREA;
 
+			
+
 			function onClick(idx){
 				window.console.log(idx);
-				var icon = new PIXI.Sprite(textures[idx]);
-				icon.interactive=true;
-				icon.anchor.x=0.5;
-				icon.anchor.y=0.5;
-				icon.width=200;
-				icon.height=200;
-				icon.position.x=SPRITE_CANVAS_LEFT+SPRITE_CANVAS_SIZE/2;
-				icon.position.y=SPRITE_CANVAS_TOP+SPRITE_CANVAS_SIZE/2;
-				//icon.tint=Math.floor(Math.random()*0xffffff);				
-				sprite_editor_container.addChild(icon);
-				icon.hitArea = collisionPolygons["decal"+(idx+1)];
-				icon.tint = COLORS[colorSelected];
-				spriteCanvasContents.contents.push(icon);				
-
-				var mask = new PIXI.Sprite(masks[maskSelected]);
-				icon.addChild(mask);
-				icon.mask=mask;
-				mask.anchor.x=0.5;
-				mask.anchor.y=0.5;
-				mask.position.x=0;
-				mask.position.y=0;
-				mask.width=256;
-				mask.height=256;
+				AddSprite(
+							idx,
+							colorSelected,
+							maskSelected,
+							SPRITE_CANVAS_LEFT+SPRITE_CANVAS_SIZE/2,
+							SPRITE_CANVAS_TOP+SPRITE_CANVAS_SIZE/2,
+							0,
+							0.8,
+							0.8
+							);
 				spriteCanvasContents.selectObject(spriteCanvasContents.contents.length-1);
-
-				OnModified();
+				OnModified(
+					spriteCanvasContents.contents.length-1,
+					idx,
+					colorSelected,
+					maskSelected);
 			}
 
 			function _hover(){

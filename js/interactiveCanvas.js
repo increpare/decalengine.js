@@ -62,7 +62,7 @@ function CreateInteractiveCanvas(x,y,w,h,source_container,source_container_FG,on
 		function handleGrabEnd(idx){
 			return function(event){
 				if (draggingTarget>=0){
-					onModified();
+					onModified(dat.target);
 				}
 				draggingTarget=-1;
 				window.console.log("end" + idx);
@@ -212,7 +212,6 @@ function CreateInteractiveCanvas(x,y,w,h,source_container,source_container_FG,on
 			manipulatorWidget.position = t.position;
 			manipulatorWidget.rotation = t.rotation;
 			manipulatorWidget.scale = t.scale;
-			manipulatorWidget.skew = t.skew;
 		}
 
 		rescaleHandles();
@@ -284,7 +283,7 @@ function CreateInteractiveCanvas(x,y,w,h,source_container,source_container_FG,on
 		}			
 		dat.contents[dat.target].alpha=1.0;
 		dat.dragging=false;
-		onModified();
+		onModified(dat.target);
 		setHandles();			
 	}
 
@@ -301,7 +300,6 @@ function CreateInteractiveCanvas(x,y,w,h,source_container,source_container_FG,on
 			manipulatorWidget.position = t.position;
 			manipulatorWidget.rotation = t.rotation;
 			manipulatorWidget.scale = t.scale;
-			manipulatorWidget.skew = t.skew;
 	    }
 	}
 	return dat;
