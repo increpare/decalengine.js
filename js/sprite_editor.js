@@ -12,6 +12,8 @@ var SPRITE_CANVAS_SIZE = PANEL_WIDTH-4*SPR_THUMBNAIL_WIDTH-6*SPR_THUMBNAIL_H_MAR
 var SPRITE_CANVAS_LEFT = PANEL_WIDTH-SPRITE_CANVAS_SIZE-3*SPR_THUMBNAIL_WIDTH-4*SPR_THUMBNAIL_H_MARGIN;
 var SPRITE_CANVAS_TOP = SPR_THUMBNAIL_V_OFFSET+2;
 	
+var DECAL_TEXTURE_SIZE = 256;
+
 var SPR_RENDER_TEXTURE_SIZE=SPRITE_CANVAS_SIZE;
 
 var sprite_editor_container_container;
@@ -111,6 +113,7 @@ function SetPalleteSelections(){
 	spriteSelectionIcon.position.y = ypos-2;
 
 }
+
 function AddSprite(
 					shapeIndex,
 					colIndex,
@@ -598,12 +601,14 @@ function makeSpriteEditor(){
 
 	
 	stage.addChild(sprite_editor_container_container)
+
+	sprite_editor_container_container.mask = canvaspanel;
+	sprite_editor_container_container.addChild(canvaspanel);
+	sprite_editor_container_container.addChild(canvaspanel2);
+	
 	sprite_editor_container_container.addChild(sprite_editor_container);
 	sprite_editor_container_container.addChild(sprite_editor_container_FG);
 	
-	sprite_editor_container_container.mask = canvaspanel;
-	sprite_editor_container.addChild(canvaspanel);
-	sprite_editor_container.addChild(canvaspanel2);
 	
 	spriteCanvasContents = CreateInteractiveCanvas(
 								SPRITE_CANVAS_LEFT,
@@ -612,7 +617,8 @@ function makeSpriteEditor(){
 								SPRITE_CANVAS_SIZE,
 								sprite_editor_container,
 								sprite_editor_container_FG,
-								OnModified
+								OnModified,
+								DECAL_TEXTURE_SIZE
 								);
 
 	widgets.push(sprite_editor_container_container);

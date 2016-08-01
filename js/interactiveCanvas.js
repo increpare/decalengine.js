@@ -1,7 +1,7 @@
 
 
-function CreateInteractiveCanvas(x,y,w,h,source_container,source_container_FG,onModified){
-
+function CreateInteractiveCanvas(x,y,w,h,source_container,source_container_FG,onModified,TEX_SIZE){
+	var H_TEX_SIZE = TEX_SIZE/2;
 	var handleTex_rotations = [
 		PIXI.Texture.fromImage("gfx/ui/handle_rotate0.png",null,PIXI.SCALE_MODES.NEAREST),
 		PIXI.Texture.fromImage("gfx/ui/handle_rotate1.png",null,PIXI.SCALE_MODES.NEAREST),
@@ -17,19 +17,6 @@ function CreateInteractiveCanvas(x,y,w,h,source_container,source_container_FG,on
 	var manipulatorWidget = new PIXI.Container();	
 	manipulatorWidget.visible = false;
 	source_container_FG.addChild(manipulatorWidget);
-
-	/*var handleOutline = new PIXI.Graphics();
-	handleOutline.lineStyle(1,0x00ffff,0.5);
-	handleOutline.drawRect(
-		-128,-128,256,256
-	);
-	handleOutline.moveTo(
-		0,-128
-	);
-	handleOutline.lineTo(
-		0,-128-50
-	);
-	manipulatorWidget.addChild(handleOutline);*/
 
 	var handleSprites = [];
 	var draggingTarget=-1;
@@ -96,9 +83,9 @@ function CreateInteractiveCanvas(x,y,w,h,source_container,source_container_FG,on
 	    					var t = dat.contents[dat.target];
 
 	    					var radius = Math.sqrt(dx*dx+dy*dy);
-	    					//if no change, should be t.scale.y*128+50
-	    					//should try preserve ratio!
-	    					var dR = radius/(Math.sqrt(128*128+128*128*ratio*ratio));
+
+	    					var hts = H_TEX_SIZE;
+	    					var dR = radius/(Math.sqrt(hts*hts+hts*hts*ratio*ratio));
 	    					t.scale.x=dR*ratio;
 	    					t.scale.y=dR;
 							t.rotation = angle-sourceangle;
@@ -127,8 +114,8 @@ function CreateInteractiveCanvas(x,y,w,h,source_container,source_container_FG,on
 	    					var dotP=dot(localMousePos,handle.position);
 
 	    					var r = Math.sqrt(dx*dx+dy*dy);
-	    					//if no change, should be t.scale.y*128+50
-	    					var dR = r/(128);
+	    					
+	    					var dR = r/(H_TEX_SIZE);
 
 	    					if (handle.position.x!==0){
 	    						t.scale.x=dR*Math.sign(localMousePos.x*handle.position.x*t.scale.x);
@@ -162,28 +149,28 @@ function CreateInteractiveCanvas(x,y,w,h,source_container,source_container_FG,on
 
 	}
 
-	handleSprites[0].position.x=128;
-	handleSprites[0].position.y=128;
+	handleSprites[0].position.x=H_TEX_SIZE;
+	handleSprites[0].position.y=H_TEX_SIZE;
 
-	handleSprites[1].position.x=128;
-	handleSprites[1].position.y=-128;
+	handleSprites[1].position.x=H_TEX_SIZE;
+	handleSprites[1].position.y=-H_TEX_SIZE;
 
-	handleSprites[2].position.x=-128;
-	handleSprites[2].position.y=-128;
+	handleSprites[2].position.x=-H_TEX_SIZE;
+	handleSprites[2].position.y=-H_TEX_SIZE;
 
-	handleSprites[3].position.x=-128;
-	handleSprites[3].position.y=128;
+	handleSprites[3].position.x=-H_TEX_SIZE;
+	handleSprites[3].position.y=H_TEX_SIZE;
 
 	handleSprites[4].position.x=0;
-	handleSprites[4].position.y=128;
+	handleSprites[4].position.y=H_TEX_SIZE;
 
-	handleSprites[5].position.x=128;
+	handleSprites[5].position.x=H_TEX_SIZE;
 	handleSprites[5].position.y=0;
 
 	handleSprites[6].position.x=0;
-	handleSprites[6].position.y=-128;
+	handleSprites[6].position.y=-H_TEX_SIZE;
 
-	handleSprites[7].position.x=-128;
+	handleSprites[7].position.x=-H_TEX_SIZE;
 	handleSprites[7].position.y=0;
 
 	var dat = {			
