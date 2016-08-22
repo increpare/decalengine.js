@@ -24,7 +24,7 @@ var spriteCanvasContents;
 
 var masks = [];
 
-var colorSelected=2;
+var colorSelected=0;
 var maskSelected=0;
 var spriteSelected=0;
 
@@ -113,6 +113,7 @@ function SetPalleteSelections(){
 	spriteSelectionIcon.position.y = ypos-2;
 
 }
+
 
 function AddSprite(
 					shapeIndex,

@@ -193,7 +193,6 @@ function CreateInteractiveCanvas(x,y,w,h,source_container,source_container_FG,on
 
 		if (dat.target>=0){
 			var t = dat.contents[dat.target];
-
 			manipulatorWidget.position = t.position;
 			manipulatorWidget.rotation = t.rotation;
 			manipulatorWidget.scale = t.scale;

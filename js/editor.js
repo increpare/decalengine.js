@@ -78,7 +78,30 @@ var colDat = {
 
 var pages = [];
 
+function onKeyPress(e) {
+
+	var ctrlPressed=0;
+	var altPressed=0;
+	var shiftPressed=0;
+
+	var evt = (e==null ? event:e);
+
+	shiftPressed=evt.shiftKey;
+	altPressed  =evt.altKey;
+	ctrlPressed =evt.ctrlKey || e.metaKey ;
+	if (ctrlPressed || altPressed){
+		return;
+	}
+
+	if (activePage===1){
+		SE_KeyPress(e);
+	}
+}
+
+document.addEventListener('keypress', onKeyPress);
+
 function setPage(index){
+	activePage=index;
 	for (var i=0;i<pages.length;i++){
 		var enable = i===index;
 		var widgets=pages[i];

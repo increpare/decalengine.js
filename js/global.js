@@ -1,3 +1,5 @@
+var activePage =0;
+
 var GAME_WIDTH = 1024;
 var GAME_HEIGHT = 600;
 var ASPECT_RATIO = 1.0*GAME_WIDTH/GAME_HEIGHT;;
@@ -7,7 +9,7 @@ var PANEL_LEFT=0;
 var PANEL_TOP=32;
 var PANEL_WIDTH=GAME_WIDTH;
 var PANEL_HEIGHT=GAME_HEIGHT-32;
-
+/*
 var COLORS = [
 	0x000000,
 	0x9D9D9D,
@@ -25,7 +27,89 @@ var COLORS = [
 	0x005784,
 	0x31A2F2,
 	0xB2DCEF
-];
+];*/
+/*
+var COLORS = [
+	0xffffff,
+	0x000000,
+	0x3f32ae,
+	0xe30ec2,
+	0xbaaaff,
+	0xff949d,
+	0xe80200,
+	0x7a243d,
+	0x195648,
+	0x6a8927,
+	0x16ed75,
+	0x32c1c3,
+	0x057fc1,
+	0x6e4e23,
+	0xc98f4c,
+	0xefe305
+];*/
+/*
+//by crimso - http://pixeljoint.com/p/49212.htm 
+//cf http://pixeljoint.com/2015/05/17/4652/16_Color_Winner_-_DBsFUN16.htm
+var COLORS = [
+	0x080008,
+	0x2a3443,
+	0x5d4632,
+	0x44508c,
+	0xa6414d,
+	0x5e6660,
+	0xc86b36,
+	0x8375af,
+	0x52903c,
+	0xdb7ebd,
+	0x5b99f4,
+	0xdeac85,
+	0x94cc4e,
+	0x84dbfc,
+	0xf2de70,
+	0xfcfffe
+];*/
+/*
+//cga
+var COLORS = [
+	0x000000,
+	0x0000aa,
+	0x00aa00,
+	0x00aaaa,
+	0xaa0000,
+	0xaa00aa,
+	0xaa5500,
+	0xaaaaaa,
+	0x555555,
+	0x5555ff,
+	0x55ff55,
+	0x55ffff,
+	0xff5555,
+	0xff55ff,
+	0xffff55,
+	0xffffff
+];*/
+
+//mspaint
+var COLORS = [
+0xffffff,
+0xc0c0c0,
+0x00ffff,
+0xff00ff,
+0xffff00,
+0xff0000,
+0x00ff00,
+0x0000ff,
+0x000000,
+0x808080,
+0x008080,
+0x800080,
+0x808000,
+0x800000,
+0x008000,
+0x000080
+]
+
+//COLORS.reverse();
 
 PIXI.scaleModes.DEFAULT = PIXI.scaleModes.NEAREST;
 
