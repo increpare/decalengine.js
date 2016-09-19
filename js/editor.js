@@ -137,6 +137,7 @@ pages.push([]);//sfx
 pages.push([]);//options
 pages.push([]);//help
 pages[1]=makeSceneEditor();
+pages[2]=makeEventEditor();
 
 // start animating
 animate();
