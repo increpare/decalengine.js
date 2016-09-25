@@ -5,6 +5,13 @@ var GAME_HEIGHT = 600;
 var ASPECT_RATIO = 1.0*GAME_WIDTH/GAME_HEIGHT;;
 
 
+function OnButtonClick(widget,fn){
+
+		widget
+			.on('mousedown', fn)
+			.on('touchstart', fn);
+}
+
 var PANEL_LEFT=0;
 var PANEL_TOP=32;
 var PANEL_WIDTH=GAME_WIDTH;
