@@ -89,13 +89,14 @@ function updateEventEditor(){
 
 
 		var col1dat = ee_contents[i][1];
-		//0bg 1panel 2sprite 3text 4panel 5sprite
+		//0bg 1panel 2sprite 3textbg 4text 5panel 6sprite
 
 		var img1 = col1dat.length===3?col1dat[1]:-2;
 		var img2 = col1dat.length===3?col1dat[2]:(col1dat.length===2?col1dat	[1]:-2);
 
-		ee_UI_Widgets_cols[1][i][3].text = col1dat[0];
-		
+		ee_UI_Widgets_cols[1][i][4].text = col1dat[0];
+		ee_UI_Widgets_cols[1][i][3].width=ee_UI_Widgets_cols[1][i][4].width+2*COLMARGIN;
+
 		var RowWidth = PANEL_WIDTH-2*EE_MARGINX-SCROLLBARWIDTH-COLMARGIN;
 		var xoffset=PANEL_LEFT+EE_MARGINX;
 		var ypos=PANEL_TOP+EE_MARGINY;
@@ -111,15 +112,21 @@ function updateEventEditor(){
 			if (img1>=-1)
 			{
 				xoffset+=ROWHEIGHT+COLMARGIN;
-			} 
+			} else {
+				xoffset+=COLMARGIN;
+			}
 			ee_UI_Widgets_cols[1][i][3].position.x=xoffset;
-			ee_UI_Widgets_cols[1][i][4].position.x = ee_UI_Widgets_cols[1][i][3].position.x + ee_UI_Widgets_cols[1][i][3].width+2*COLMARGIN;
-			ee_UI_Widgets_cols[1][i][5].position.x = ee_UI_Widgets_cols[1][i][3].position.x + ee_UI_Widgets_cols[1][i][3].width+2*COLMARGIN;
+			ee_UI_Widgets_cols[1][i][4].position.x=xoffset+COLMARGIN;
+			ee_UI_Widgets_cols[1][i][5].position.x = ee_UI_Widgets_cols[1][i][4].position.x + ee_UI_Widgets_cols[1][i][4].width+2*COLMARGIN;
+			ee_UI_Widgets_cols[1][i][6].position.x = ee_UI_Widgets_cols[1][i][4].position.x + ee_UI_Widgets_cols[1][i][4].width+2*COLMARGIN;
 		} else {
 			if (img1>=-1){
 				xoffset+=ROWHEIGHT;				
+			} else {
+				xoffset+=COLMARGIN;
 			}
 			ee_UI_Widgets_cols[1][i][3].position.x=xoffset;
+			ee_UI_Widgets_cols[1][i][4].position.x=xoffset+COLMARGIN;
 		}
 
 		if (img1===-2){
@@ -130,11 +137,11 @@ function updateEventEditor(){
 			ee_UI_Widgets_cols[1][i][2].visible=true;
 		}
 		if (img2===-2){
-			ee_UI_Widgets_cols[1][i][4].visible=false;
 			ee_UI_Widgets_cols[1][i][5].visible=false;
+			ee_UI_Widgets_cols[1][i][6].visible=false;
 		} else {
-			ee_UI_Widgets_cols[1][i][4].visible=true;
 			ee_UI_Widgets_cols[1][i][5].visible=true;
+			ee_UI_Widgets_cols[1][i][6].visible=true;
 		}
 
 	}
@@ -249,14 +256,41 @@ function makeEventEditor(){
 				
 			
 
+
+
 				var basicText = new PIXI.Text("does");
 				basicText.interactive = false;
 				basicText.hitArea = NO_HIT_AREA;
 				basicText.x = xpos+COLMARGIN*3+ROWHEIGHT-2*COLMARGIN;
-				basicText.y = ypos+(ROWHEIGHT)/2-basicText.height/2;	
+				basicText.y = ypos+(ROWHEIGHT)/2-basicText.height/2;
+
+
+				var textBG = new PIXI.Graphics();
+				var ph = ROWHEIGHT-2*COLMARGIN;
+				var pw = ROWHEIGHT-2*COLMARGIN;
+				var pxpos = xpos+COLMARGIN;
+				var pypos = ypos+COLMARGIN;
+				textBG.lineStyle(1,0xffffff);
+				textBG.beginFill(0xaaaaaa, 1);
+				textBG.interactive=true;
+				textBG.buttonMode=true;
+
+				textBG.drawRect(
+					0,
+					0,
+					basicText.width,
+					basicText.height
+				);
+				textBG.position.x=basicText.x;
+				textBG.position.y=basicText.y;
+
+
+				tableContainer.addChild(textBG);	
+				rowdat.push(textBG);
+
 				tableContainer.addChild(basicText);	
 				rowdat.push(basicText);
-					
+
 
 
 				var panel = new PIXI.Graphics();
